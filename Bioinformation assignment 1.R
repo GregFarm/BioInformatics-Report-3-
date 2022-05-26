@@ -68,6 +68,11 @@ SW_SD05 <- sd(SW_data$Circumf_2005_cm, na.rm = TRUE)
 SW_mean20 <- mean(SW_data$Circumf_2020_cm, na.rm = TRUE)
 SW_SD20 <- sd(SW_data$Circumf_2020_cm, na.rm = TRUE)
 
+
+
+
+
+
 #BOX PLOT 
 
 boxplot(NE_data$Circumf_2005_cm, NE_data$Circumf_2020_cm,
@@ -77,18 +82,140 @@ boxplot(NE_data$Circumf_2005_cm, NE_data$Circumf_2020_cm,
         ylab = "Mean Tree Circumference (cm)",
         col = "green"
         )
-#TEST
 
+#Calcing the means from the last 10 years growth 
 
-
-
-
-
-
-
-
-
-
+#calcing t.test and wilcox.test
 
 #botplot, stack overflow to find out how to add extra details to the boxplot, eg adding spaces between the sets of box plots. 
+
+
+
+
+
+#PART 2 Mycobacterium tuberculosis GCA_001318445
+library("seqinr")
+library("kableExtra")
+library("R.utils")
+
+# download cds Ecoli and Mturb
+URL_M <- "http://ftp.ensemblgenomes.org/pub/bacteria/release-53/fasta/bacteria_4_collection/mycobacterium_tuberculosis_gca_001318445/cds/Mycobacterium_tuberculosis_gca_001318445.6505_5_10.cds.all.fa.gz"
+download.file(URL3, destfile = "Mturb_cds.fa.gz")
+URL_E="http://ftp.ensemblgenomes.org/pub/bacteria/release-53/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655_gca_000005845/cds/Escherichia_coli_str_k_12_substr_mg1655_gca_000005845.ASM584v2.cds.all.fa.gz"
+download.file(URL_E, destfile="ecoli_cds.fa.gz")
+
+gunzip("Mturb_cds.fa.gz")
+gunzip("ecoli_cds.fa.gz")
+
+ecoli_cds <- seqinr::read.fasta("ecoli_cds.fa")
+mturb_cds <- seqinr::read.fasta("Mturb_cds.fa")
+
+length(mturb_cds)
+# mturb coding seqs is 4752
+length(ecoli_cds)
+#ecoli coding seqs is 4239
+
+m_len<-sapply(X = mturb_cds, FUN = length)
+sum(m_len)
+
+# mturb seq length 3,072,513
+e_len<-sapply(X = ecoli_cds, FUN = length)
+sum(e_len)
+#ecoli seq length 3,978,528
+
+#2 boxplot of all coding squences 
+
+boxplot(m_len, e_len, names = c("M. tuberculosis","E. coli"),
+        main = "Coding Sequence Length Comparisen between M. tuberculosis and E. coli",
+          ylab = "Base Pair Length (bp)",
+        col = c("green","red"))
+
+#mean and median 
+mean(m_len)
+median(m_len)
+#mean = 647, median = 501
+
+mean(e_len)
+median(e_len)
+#mean = 939. median = 831
+
+#3 nt count 
+m_dna <- unlist(mturb_cds)
+m_dna_comp <-count(m_dna, wordsize = 1)
+m_dna_comp
+
+e_dna <- unlist(ecoli_cds)
+e_dna_comp <-count(e_dna, wordsize = 1)
+e_dna_comp
+
+#AA count 
+m_prot <- lapply(X=mturb_cds, FUN = translate)
+m_prot
+m_comp<- unlist(m_prot)
+m_aa <- count(m_comp, wordsize = 1, alphabet = aa)
+
+e_prot <- lapply(X=ecoli_cds, FUN = translate)
+e_prot
+e_comp<- unlist(e_prot)
+e_aa <-count(e_comp, wordsize = 1, alphabet = aa)
+
+#NT bar plots
+barplot(m_dna_comp, xlab = "Nucleotide", ylab = "Frequency",
+        main = "M. tuberculosis CDS comp")
+#far highter GC content 
+barplot(e_dna_comp, xlab = "Nucleotide", ylab = "Frequency",
+        main = "E. coli CDS comp")
+
+#AA bar plot
+barplot(m_aa, xlab = "Amino Acids", 
+        ylab = "Frequency", ylim = c(0,140000), 
+        main = "Amino acids frequence in M. tuberculosis")
+
+barplot(e_aa, xlab = "Amino Acids", ylab = "Frequency",
+        main = "Amino acids frequence in E.coli")
+
+
+#4 Codon usages use the unpacked 
+m_codon <- uco(m_dna, index="rscu", as.data.frame = TRUE)
+m_codon
+
+e_codon <-uco(e_dna, index="rscu", as.data.frame = TRUE)
+e_codon
+
+#sexy tables
+
+m_codon %>%
+  kbl()%>%
+  kable_paper("hover", full_width = F)
+?kable_paper
+
+e_codon %>%
+  kbl()%>%
+  kable_paper("hover", full_width = F)
+?kable_paper
+
+
+#K-mer profiling 
+
+m_freq <- count(m_comp,wordsize=3,alphabet=aa,freq=TRUE)
+head(m_freq)
+
+
+m_codon_low <- m_codon[order(m_codon$freq),]
+m_codon_low
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
