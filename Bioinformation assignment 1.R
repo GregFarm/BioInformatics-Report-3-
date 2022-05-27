@@ -85,6 +85,8 @@ boxplot(NE_data$Circumf_2005_cm, NE_data$Circumf_2020_cm,
 
 #Calcing the means from the last 10 years growth 
 
+
+
 #calcing t.test and wilcox.test
 
 #botplot, stack overflow to find out how to add extra details to the boxplot, eg adding spaces between the sets of box plots. 
@@ -159,12 +161,25 @@ e_prot
 e_comp<- unlist(e_prot)
 e_aa <-count(e_comp, wordsize = 1, alphabet = aa)
 
+#MINUS THE TERMINATION CODON
+
 #NT bar plots
 barplot(m_dna_comp, xlab = "Nucleotide", ylab = "Frequency",
         main = "M. tuberculosis CDS comp")
 #far highter GC content 
 barplot(e_dna_comp, xlab = "Nucleotide", ylab = "Frequency",
         main = "E. coli CDS comp")
+
+#two in one barpolt 
+#barplot(as.matrix(rbind(El92, El96)), beside=TRUE)
+barplot(as.matrix(rbind(m_dna_comp, e_dna_comp)), beside = TRUE, 
+        names = c("a","c","g","t"), col = c("red","blue"),
+        ylim = c(0,1200000),
+        xlab = "Nucleotide", ylab = "Nucleotide Frequency (bp)",
+        main = "Nucleotide Fequencies Comparison Between M. tuberculosis & E. coli")
+#legend(19, c("Republicans", "Democrats"), horiz = T, col=c("red","blue"), fill=c("red","blue"))
+legend("topleft", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blue"), fill = c("red", "blue"))
+
 
 #AA bar plot
 barplot(m_aa, xlab = "Amino Acids", 
@@ -173,7 +188,12 @@ barplot(m_aa, xlab = "Amino Acids",
 
 barplot(e_aa, xlab = "Amino Acids", ylab = "Frequency",
         main = "Amino acids frequence in E.coli")
-
+# COMBINED
+barplot(as.matrix(rbind(m_dna_comp, e_dna_comp)), beside = TRUE, 
+        names = c("a","c","g","t"), col = c("red","blue"),
+        ylim = c(0,1200000),
+        xlab = "Nucleotide", ylab = "Nucleotide Frequency (bp)",
+        main = "Nucleotide Fequencies Comparison Between M. tuberculosis & E. coli")
 
 #4 Codon usages use the unpacked 
 m_codon <- uco(m_dna, index="rscu", as.data.frame = TRUE)
@@ -183,16 +203,17 @@ e_codon <-uco(e_dna, index="rscu", as.data.frame = TRUE)
 e_codon
 
 #sexy tables
+?kable_paper
 
-m_codon %>%
+m_codon%>%
   kbl()%>%
   kable_paper("hover", full_width = F)
-?kable_paper
+
 
 e_codon %>%
   kbl()%>%
   kable_paper("hover", full_width = F)
-?kable_paper
+
 
 
 #K-mer profiling 

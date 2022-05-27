@@ -5,8 +5,16 @@ date: '2022-05-22'
 output: html_document
 ---
 
+### Intro 
+Source code: https://github.com/GregFarm/BioInformatics-Report-3-/blob/main/BioInfo%20Report.Rmd 
+
+Before knitting the Rmarkdown, please ensure that the correct libraries are loading in. The libraries needed are seqinr, kableExtra, R.utils. 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library("seqinr")
+library("kableExtra")
+library("R.utils")
 ```
 
 # Assignement Part 1 - Gene Expression 
