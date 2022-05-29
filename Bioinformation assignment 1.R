@@ -9,38 +9,38 @@ str(gene_exp)
 gene_exp[1:6,]
 
 #2 new col containing the mean from all other cols.
-gene_mean <- (gene_exp$GTEX.1117F.0226.SM.5GZZ7 + gene_exp$GTEX.1117F.0426.SM.5EGHI + gene_exp$GTEX.1117F.0526.SM.5EGHJ) /3
-gene_exp$Exp.Mean <- signif(gene_mean, digits = 6)
+gene_mean <- (gene_exp$GTEX.1117F.0226.SM.5GZZ7 + gene_exp$GTEX.1117F.0426.SM.5EGHI + gene_exp$GTEX.1117F.0526.SM.5EGHJ)/3
+gene_exp['Mean'] <- signif(gene_mean, digits = 6)
+
 
 #USE APPLY()
 
 
-gene_exp[1:6,]
+View(gene_exp[1:6,])
 
 #3 list of 10 gene with the highest mean
 
 high_mean <- gene_exp[order(-gene_exp$Exp.Mean),]
-high_mean
-
-high_mean[1:10,]
+View(high_mean[1:10,])
 
 #4 How many gene have a mean <10 
 
-true_sum <- gene_exp$Exp.Mean < 10
+true_sum <- gene_exp$Mean < 10
 
 sum(true_sum, na.rm = TRUE)
 
 #5 histagram of mean values 
 
-x_vals <- gene_exp$Exp.Mean
+x_vals <- gene_exp$Mean
 #Jess's hist, just stack overflow to to make my own adjustments 
-h <-hist(x_vals,main="Part1 Q5: Mean Gene Expression Values", xlab="Mean Gene Expression",breaks="scott",xlim=c(0,10000),ylim = c(0,50000))
+h <-hist(x_vals,main="Mean Gene Expression Values", xlab="Mean Gene Expression",breaks="scott",xlim=c(0,10000),ylim = c(0,50000))
 
 
 
 #part 2 q6
 URL2 <- "https://raw.githubusercontent.com/markziemann/SLE712_files/master/assessment_task3/bioinfo_asst3_part1_files/growth_data.csv"
 grow_data <- read.csv(URL2)
+colnames(grow_data)
 str(grow_data)
 
 #mean and sd of
@@ -85,10 +85,18 @@ boxplot(NE_data$Circumf_2005_cm, NE_data$Circumf_2020_cm,
 
 #Calcing the means from the last 10 years growth 
 
+NE_tenyear <-NE_data[,c("Circumf_2010_cm", "Circumf_2015_cm", "Circumf_2020_cm")]
+NE_tenyear_mean <- colMeans(NE_tenyear, na.rm = TRUE)
+sum(NE_tenyear_mean)/3
 
+SW_tenyear <-SW_data[,c("Circumf_2010_cm", "Circumf_2015_cm", "Circumf_2020_cm")]
+SW_tenyear_mean <- colMeans(SW_tenyear, na.rm = TRUE)
+sum(SW_tenyear_mean)/3
 
 #calcing t.test and wilcox.test
 
+ttest <- t.test(NE_tenyear, SW_tenyear)
+ttest[c(3,3)]
 #botplot, stack overflow to find out how to add extra details to the boxplot, eg adding spaces between the sets of box plots. 
 
 

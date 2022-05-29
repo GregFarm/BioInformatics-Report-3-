@@ -19,20 +19,107 @@ library("R.utils")
 
 # Assignement Part 1 - Gene Expression 
 ### Questions 1 - Read in the gene_expression.cvs file and show the values of the first row 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r, mychuck1.1}
+URL = "https://raw.githubusercontent.com/markziemann/SLE712_files/master/assessment_task3/bioinfo_asst3_part1_files/gene_expression.tsv"
+gene_exp <- read.table(URL, stringsAsFactors = FALSE, header = TRUE)
+gene_exp[1:6,]
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+### Questions 2 - Make a new column which is the mean of the other columns. Show a table of values for the first six genes
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+```{r, mychunk1.2}
+gene_mean <- (gene_exp$GTEX.1117F.0226.SM.5GZZ7 + gene_exp$GTEX.1117F.0426.SM.5EGHI + gene_exp$GTEX.1117F.0526.SM.5EGHJ)/3
+gene_exp['Mean'] <- signif(gene_mean, digits = 6)
+gene_exp[1:6,]
+
+```
+### Questions 3 - List the 10 genes with the highest mean expression
+```{r, mychunk1.3}
+high_mean <- gene_exp[order(-gene_exp$Mean),]
+high_mean[1:10,]
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+### Questions 4 - Determine the number of genes with a mean <10
+```{r, mychunk1.4}
+true_sum <- gene_exp$Mean < 10
+sum(true_sum, na.rm = TRUE)
+```
+If the mean was higher then 10 it converted it into a TRUE value, than the total amount of TRUE values was summed together. 
+It was found that 35,988 mean gene expression was higher then 10. 
+
+### Questions 5 - Make a histogram plot of the mean values and include it into your report.
+```{r, mychunk1.5}
+x_vals <- gene_exp$Mean
+h <-hist(x_vals,main="Mean Gene Expression Values", xlab="Mean Gene Expression",breaks= "scott" ,xlim=c(0,10000),ylim = c(0,50000), col = "blue")
+ 
+```
+### Questions 6 - Import this csv file into an R object. What are the column names?
+```{r, mychunk1.6}
+URL2 <- "https://raw.githubusercontent.com/markziemann/SLE712_files/master/assessment_task3/bioinfo_asst3_part1_files/growth_data.csv"
+grow_data <- read.csv(URL2)
+colnames(grow_data)
+```
+Simply using the `colnames` function to return the column names, being:
+Site
+TreeID
+Circumf_2005_cm
+Circumf_2010_cm
+Circumf_2015_cm
+Circumf_2020_cm
+
+### Questions 7 - Calculate the mean and standard deviation of tree circumference at the start and end of the study at both sites.
+```{r, mychunk1.7}
+#northeast data
+NE_data <-grow_data[grep("northeast", grow_data$Site),]
+NE_mean05 <- mean(NE_data$Circumf_2005_cm, na.rm = TRUE)
+NE_SD05 <- sd(NE_data$Circumf_2005_cm, na.rm = TRUE)
+NE_mean20 <- mean(NE_data$Circumf_2020_cm, na.rm = TRUE)
+NE_SD20 <- sd(NE_data$Circumf_2020_cm, na.rm = TRUE)
+cat(paste("NorthEast 2005 mean =", NE_mean05), sep="\n")
+cat(paste("NorthEast 2005 standard deviation =", signif(NE_SD05,digits = 3)), sep="\n")
+cat(paste("NorthEast 2020 mean =", NE_mean20), sep="\n")
+cat(paste("NorthEast 2020 standard deviation =", signif(NE_SD20,digits = 3)), sep="\n")
+
+#southwest data
+SW_data <-grow_data[grep("southwest", grow_data$Site),]
+SW_mean05 <- mean(SW_data$Circumf_2005_cm, na.rm = TRUE)
+SW_SD05 <- sd(SW_data$Circumf_2005_cm, na.rm = TRUE)
+SW_mean20 <- mean(SW_data$Circumf_2020_cm, na.rm = TRUE)
+SW_SD20 <- sd(SW_data$Circumf_2020_cm, na.rm = TRUE)
+cat(paste("SouthWest 2005 mean =", SW_mean05), sep="\n")
+cat(paste("SouthWest 2005 standard deviation =", signif(SW_SD05,digits = 3)), sep="\n")
+cat(paste("SouthWest 2020 mean =", SW_mean20), sep="\n")    
+cat(paste("SouthWest 2020 standard deviation =", signif(SW_SD20,digits = 3)), sep="\n")         
+```
+This returns all the values individually. 
+
+### Questions 8 - Make a box plot of tree circumference at the start and end of the study at both sites.
+```{r, mychunk1.8}
+boxplot(NE_data$Circumf_2005_cm, NE_data$Circumf_2020_cm,
+        SW_data$Circumf_2005_cm, SW_data$Circumf_2020_cm,
+        main ="Plant Circumference Data at Different Sites Over Time",
+        names = c("Northeast 2005","Northeast 2020","Southwest 2005","Southwest 2020"),
+        ylab = "Mean Tree Circumference (cm)",
+        col = "green"
+        )
+```
+### Questions 9 - Calculate the mean growth over the last 10 years at each site.
+```{r, mychunk1.9}
+NE_tenyear <-NE_data[,c("Circumf_2010_cm", "Circumf_2015_cm", "Circumf_2020_cm")]
+NE_tenyear_mean <- colMeans(NE_tenyear, na.rm = TRUE)
+sum(NE_tenyear_mean)/3
+
+SW_tenyear <-SW_data[,c("Circumf_2010_cm", "Circumf_2015_cm", "Circumf_2020_cm")]
+SW_tenyear_mean <- colMeans(SW_tenyear, na.rm = TRUE)
+sum(SW_tenyear_mean)/3
+```
+Above is the mean growth for each site over the last 10 years. 
+The mean growth over a ten year period, 2010 to 2020, was 30.0 cm at the north east location and 25.7 cm at the south west location. 
+
+### Questions 10 - Use the t.test and wilcox.test functions to estimate the p-value that the 10 year growth is different at the two sites.
+```{r, mychunk 1.10}
+ttest <- t.test(NE_tenyear, SW_tenyear)
+ttest[c(3,3)]
+```
