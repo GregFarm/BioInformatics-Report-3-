@@ -121,5 +121,98 @@ The mean growth over a ten year period, 2010 to 2020, was 30.0 cm at the north e
 ### Questions 10 - Use the t.test and wilcox.test functions to estimate the p-value that the 10 year growth is different at the two sites.
 ```{r, mychunk 1.10}
 ttest <- t.test(NE_tenyear, SW_tenyear)
-ttest[c(3,3)]
+ttest$p.value
+```
+
+
+
+# Assignement Part 2 - Examining biological sequence diversity
+
+For this section the organisms being used are E.coli (SPECIFY) and Mycobacterium tuberculosis (GCA_001318445)
+
+### Questions 1.1 - Download the whole set of coding DNA sequences for E. coli and your organism of interest. 
+```{r, mychunk2.1}
+URL_M <- "http://ftp.ensemblgenomes.org/pub/bacteria/release-53/fasta/bacteria_4_collection/mycobacterium_tuberculosis_gca_001318445/cds/Mycobacterium_tuberculosis_gca_001318445.6505_5_10.cds.all.fa.gz"
+download.file(URL_M, destfile = "Mturb_cds.fa.gz")
+URL_E="http://ftp.ensemblgenomes.org/pub/bacteria/release-53/fasta/bacteria_0_collection/escherichia_coli_str_k_12_substr_mg1655_gca_000005845/cds/Escherichia_coli_str_k_12_substr_mg1655_gca_000005845.ASM584v2.cds.all.fa.gz"
+download.file(URL_E, destfile="ecoli_cds.fa.gz")
+
+gunzip("Mturb_cds.fa.gz")
+gunzip("ecoli_cds.fa.gz")
+
+ecoli_cds <- seqinr::read.fasta("ecoli_cds.fa")
+mturb_cds <- seqinr::read.fasta("Mturb_cds.fa")
+
+```
+### Question 1.2 - How many coding sequences are present in these organisms? How much coding DNA is there in total for these two organisms? Describe any differences between the two organisms.
+
+```{r, mychunk2.2}
+length(mturb_cds)
+length(ecoli_cds)
+```
+The total amount of coding sequences in M. tuberculosis is 4,752 and for E. coli the total amount of coding sequences is 4239.
+
+```{r, mychunk2.3}
+m_len<-sapply(X = mturb_cds, FUN = length)
+sum(m_len)
+e_len<-sapply(X = ecoli_cds, FUN = length)
+sum(e_len)
+```
+M. tuberculosis has a total of 3,072,513 coding nucleotides.
+E. coli has a total of 3,978,528 coding nucleotides. 
+
+M. tuberculosis has 513 more coding sequences, yet nearly 1 million less coding nucleotides comapred to E. coli. 
+
+### Question 2.1 - Calculate the length of all coding sequences in these two organisms. Make a boxplot of coding sequence length in these organisms.
+
+```{r, mychunk2.4}
+boxplot(m_len, e_len, names = c("M. tuberculosis","E. coli"),
+        main = "Coding Sequence Comaprison: M. tuberculosis and E. coli",
+          ylab = "Base Pair Length (bp)",
+        col = c("green","red"))
+
+```
+
+### Question 2.2 - What is the mean and median coding sequence length of these two organisms? Describe any differences between the two organisms
+
+```{r, mychunk2.5}
+signif(mean(m_len), digits = 4) 
+median(m_len)
+
+signif(mean(e_len), digits = 4) 
+median(e_len)
+```
+The mean and median coding sequences length for M. tuberculosis was shown to be 647bp and 501bp respectively. 
+The mean and median coding sequences length for E. coli was shown to be 939 bp and 801bp respectively. (MORE DETAILS)
+
+### Question 3.1 - Calculate the frequency of DNA bases in the total coding sequences for both organisms. Perform the same calculation for the total protein sequence.   
+```{r, muchunk2.6}
+# nt count 
+m_dna <- unlist(mturb_cds)
+m_dna_comp <-count(m_dna, wordsize = 1)
+m_dna_comp
+
+e_dna <- unlist(ecoli_cds)
+e_dna_comp <-count(e_dna, wordsize = 1)
+e_dna_comp
+
+
+#AA count 
+m_prot <- lapply(X=mturb_cds, FUN = translate)
+m_comp<- unlist(m_prot)
+aa <- unique(m_prot)
+aa <- aa[aa != "*"]
+length(aa)
+m_aa <- count(m_comp, wordsize = 1, alphabet = aa)
+
+e_prot <- lapply(X=ecoli_cds, FUN = translate)
+e_comp<- unlist(e_prot)
+e_aa <-count(e_comp, wordsize = 1, alphabet = aa)
+
+#MINUS THE TERMINATION CODON
+
+aa <- unique(prot)
+aa <-aa[aa !="*"]
+length(aa)
+
 ```

@@ -171,6 +171,10 @@ e_aa <-count(e_comp, wordsize = 1, alphabet = aa)
 
 #MINUS THE TERMINATION CODON
 
+aa <- unique(prot[[2]])
+aa <-aa[aa !="*"]
+length(aa)
+
 #NT bar plots
 barplot(m_dna_comp, xlab = "Nucleotide", ylab = "Frequency",
         main = "M. tuberculosis CDS comp")
