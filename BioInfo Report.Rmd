@@ -15,6 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library("seqinr")
 library("kableExtra")
 library("R.utils")
+library("dplyr")
 ```
 
 # Assignement Part 1 - Gene Expression 
@@ -196,23 +197,109 @@ e_dna <- unlist(ecoli_cds)
 e_dna_comp <-count(e_dna, wordsize = 1)
 e_dna_comp
 
-
+```
+```{r, mychunk2.8}
 #AA count 
-m_prot <- lapply(X=mturb_cds, FUN = translate)
-m_comp<- unlist(m_prot)
-aa <- unique(m_prot)
+#MINUS THE TERMINATION CODON
+
+m_prot <- lapply(mturb_cds, translate)
+aa <- unique(m_prot[[2]])
 aa <- aa[aa != "*"]
-length(aa)
-m_aa <- count(m_comp, wordsize = 1, alphabet = aa)
+m_comp <- unlist(m_prot)
+m_aa <- count(m_comp, wordsize = 1 , alphabet = aa)
+
 
 e_prot <- lapply(X=ecoli_cds, FUN = translate)
 e_comp<- unlist(e_prot)
 e_aa <-count(e_comp, wordsize = 1, alphabet = aa)
+```
 
-#MINUS THE TERMINATION CODON
+### Question 3.2 -Create bar plots for nucleotide and amino acid frequency. Describe any differences between the two organisms.
 
-aa <- unique(prot)
-aa <-aa[aa !="*"]
-length(aa)
+```{r, mychunk2.7}
+#NT barplot
+barplot(as.matrix(rbind(m_dna_comp, e_dna_comp)), beside = TRUE, 
+        names = c("a","c","g","t"), col = c("red","blue"),
+        ylim = c(0,1200000),
+        xlab = "Nucleotide", ylab = "Nucleotide Frequency (bp)",
+        main = "Nucleotide Fequencies Comparison Between M. tuberculosis & E. coli")
+legend("topleft", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blue"), fill = c("red", "blue"))
+```
+
+
+```{r, mychunk2.9}
+#AA bar plot
+barplot(as.matrix(rbind(m_aa, e_aa)), beside = TRUE, ylim = c(0,160000), 
+        col = c("red","blue"),
+        xlab = "Amino Acids", ylab = "Amino Acid Frequency",
+        main = "Amino Acid Fequencies Comparison Between M. tuberculosis & E. coli")
+legend("topright", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blue"), fill = c("red", "blue"))
+```
+DESCRIBE ANY DIFFERENCES
+
+### Question 4.1 -Create a codon usage table and quantify the codon usage bias among all coding sequences.
+
+```{r, mychunk2.10}
+m_codon <- uco(m_dna, index="rscu", as.data.frame = TRUE)
+m_codon%>%
+  kbl(caption = "M. tuberculosis Codon Usage")%>%
+  kable_styling(bootstrap_option = c("striped", "hover", "responsive", "condensed"), full_width = TRUE, fixed_thead=TRUE )
+
+e_codon <-uco(e_dna, index="rscu", as.data.frame = TRUE)
+e_codon[order(e_codon$RSCU, decreasing = TRUE),]%>%
+  kbl(caption = "E coli Codon Usage")%>%
+  kable_styling(bootstrap_option = c("striped", "hover", "responsive", "condensed"), full_width = TRUE, fixed_thead=TRUE )
 
 ```
+DESCRIBE BIAS
+
+
+### Question 5.1 - In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most overand under-represented k-mers in your organism of interest.
+
+```{r, mychunk2.11}
+options(scipen=999)
+#M. tuberculosis k-mer (3,4,5)
+m_freq3 <-  count(m_comp,wordsize=3,alphabet=aa,freq=TRUE)
+m_freq4 <-  count(m_comp,wordsize=4,alphabet=aa,freq=TRUE)
+m_freq5 <-  count(m_comp,wordsize=5,alphabet=aa,freq=TRUE)
+
+m_sorted_high <- head(sort(m_freq3, decreasing = TRUE),n=5L)
+m_sorted_high
+ AAA         LAA         AAL         ALA         VAA 
+m_sorted_low <-head(sort(m_freq3, decreasing = FALSE),n=5L)
+m_sorted_low
+YHM            WKM            WKW            WMN            WNK 
+
+
+#E.coli k-mer (3,4,5)
+e_freq3 <-  count(e_comp,wordsize=3,alphabet=aa,freq=TRUE)
+e_freq4 <-  count(e_comp,wordsize=4,alphabet=aa,freq=TRUE)
+e_freq5 <-  count(e_comp,wordsize=5,alphabet=aa,freq=TRUE)
+
+View(e_freq3)
+
+e_sorted_high <- e_freq3[c(1,2889,161,153,5777)]
+e_sorted_high
+
+e_sorted_low <-head(sort(e_freq3, decreasing = FALSE),n=5L)
+e_sorted_low
+
+
+barplot(as.matrix(rbind(m_sorted_high, e_sorted_high)), beside = TRUE)
+barplot(as.matrix(rbind(m_sorted_low, e_sorted_low)), beside = TRUE)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+

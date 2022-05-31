@@ -237,8 +237,7 @@ head(m_freq)
 m_codon_low <- m_codon[order(m_codon$freq),]
 m_codon_low
 
-
-
+e_sorted_high
 
 
 
