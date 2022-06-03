@@ -9,7 +9,7 @@ output: html_document
 Source code: https://github.com/GregFarm/BioInformatics-Report-3-/blob/main/BioInfo%20Report.Rmd 
 
 
-This assignment is to assess our proficiency of using Rstudio and the r-coding language. With use of growth data, gene expression data and comparing the coding sequences of two bacteria, this report was constucted to show an understanding of some of the most useful aspects of Rstudio and how it can be applied in bioinformatics. All fo the coding sequences are left in for the clarity of the assessor. 
+This assignment is to assess our proficiency of using Rstudio and the r-coding language. With use of growth data, gene expression data and comparing the coding sequences of two bacteria, this report was constructed to show an understanding of some of the most useful aspects of Rstudio and how it can be applied in bioinformatics. All fo the coding sequences are left in for the clarity of the assessor. 
 
 
 Before knitting the Rmarkdown, please ensure that the correct libraries are loading in. The libraries needed are seqinr, kableExtra, R.utils. 
@@ -62,6 +62,7 @@ The gene_exp data frame was ordered from highest to lowest mean and the top ten 
 high_mean <- gene_exp[order(-gene_exp$Mean),]
 high_mean[1:10,]
 ```
+
 
 
 ### Questions 4 - Determine the number of genes with a mean <10
@@ -155,6 +156,7 @@ cat(paste("SouthWest 2020 standard deviation =", signif(SW_SD20,digits = 3)), se
 
 Above, the results are returned individually.
 
+
 NorthEast 2005 mean = 5.292
 
 
@@ -182,7 +184,7 @@ SouthWest 2020 standard deviation = 17.9
 ### Questions 8 - Make a box plot of tree circumference at the start and end of the study at both sites.
 
 
-A boxplot of both locations and timeframes was constructed. 
+A box plot of both locations and time frames was constructed. 
 ```{r, mychunk1.8}
 boxplot(NE_data$Circumf_2005_cm, NE_data$Circumf_2020_cm,
         SW_data$Circumf_2005_cm, SW_data$Circumf_2020_cm,
@@ -242,7 +244,7 @@ For this section the organisms being used are *Mycobacterium tuberculosis* (GCA_
 ### Questions 1.1 - Download the whole set of coding DNA sequences for E. coli and your organism of interest. 
 
 
-Both organsisms FASTA files were read into Rstudio. 
+Both organisms FASTA files were read into Rstudio. 
 ```{r, mychunk2.1}
 URL_M <- "http://ftp.ensemblgenomes.org/pub/bacteria/release-53/fasta/bacteria_4_collection/mycobacterium_tuberculosis_gca_001318445/cds/Mycobacterium_tuberculosis_gca_001318445.6505_5_10.cds.all.fa.gz"
 download.file(URL_M, destfile = "Mturb_cds.fa.gz")
@@ -261,13 +263,14 @@ mturb_cds <- seqinr::read.fasta("Mturb_cds.fa")
 
 The amount of coding sequences was found. `unzip` was used to to unpack the DNA info out of its coding sequences and the total amount was found. 
 
+
 ```{r, mychunk2.2}
 length(mturb_cds)
 length(ecoli_cds)
 ```
 
 
-The total amount of coding sequences in *M. tuberculosis* is 4,752 and for *E. coli* the total amount of coding sequences is 4239.
+The total amount of coding sequences in *M. tuberculosis* is 4,752 and for *E. coli* the total amount of coding sequences is 4,239.
 
 
 ```{r, mychunk2.3}
@@ -292,12 +295,12 @@ sum(e_len)
 
 The lengths of all coding sequences was found above and those values were used to construct a boxplot
 
+
 ```{r, mychunk2.4}
 boxplot(m_len, e_len, names = c("M. tuberculosis","E. coli"),
         main = "Coding Sequence Comaprison: M. tuberculosis and E. coli",
           ylab = "Base Pair Length (bp)",
         col = c("green","red"))
-
 ```
 
 
@@ -335,10 +338,6 @@ e_dna_comp
 
 ```
 
-
-The output above shows first the *M. tuberculosis* DNA composition and then *E. coli* 
-
-
 ```{r, mychunk2.7}
 m_prot <- lapply(mturb_cds, translate)
 aa <- unique(m_prot[[2]])
@@ -346,18 +345,22 @@ aa <- aa[aa != "*"]
 m_comp <- unlist(m_prot)
 m_aa <- seqinr::count(m_comp, wordsize = 1 , alphabet = aa)
 
-
-e_prot <- lapply(X=ecoli_cds, FUN = translate)
-e_comp<- unlist(e_prot)
-e_aa <-seqinr::count(e_comp, wordsize = 1, alphabet = aa)
+e_prot <- lapply(ecoli_cds, translate)
+aa <- unique(m_prot[[2]])
+aa <- aa[aa != "*"]
+e_comp <- unlist(e_prot)
+e_aa <- seqinr::count(e_comp, wordsize = 1 , alphabet = aa)
 ```
+
+The output above shows first the *M. tuberculosis* DNA composition and then *E. coli* 
 
 
 ### Question 3.2 -Create bar plots for nucleotide and amino acid frequency. Describe any differences between the two organisms.
 
-
 A barplot is used to compare the nucleotide frequency of the two organsisms, the same is doen for the amino acids. 
+
 ```{r, mychunk2.8}
+#NT barplot
 
 barplot(as.matrix(rbind(m_dna_comp, e_dna_comp)), beside = TRUE, 
         names = c("a","c","g","t"), col = c("red","blue"),
@@ -368,11 +371,13 @@ legend("topleft", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blu
 ```
 
 
+
 We know from questions 1 that *M. tuberculosis* have close to 1 million less base-pairs. Which can be seen in the graph above. *M. tuberculosis* has around after the amount of adenine and thymine when compared to *E. coli*.
 
 
-```{r, mychunk2.9}
 
+```{r, mychunk2.9}
+#AA bar plot
 barplot(as.matrix(rbind(m_aa, e_aa)), beside = TRUE, ylim = c(0,160000), 
         col = c("red","blue"),
         xlab = "Amino Acids", ylab = "Amino Acid Frequency",
@@ -381,17 +386,20 @@ legend("topright", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "bl
 ```
 
 
+
 We can see in the graph above that on average *E. coli* contains more of each amino acid, except for Arganine, Proline and Alanine. 
 
 
-This would be expected due the *E. coli* have close to 1 million more nucleotides in the coding DNA. 
+This would be expected due the *E. coli* have close to 1 million more nucleotides in the coding DNA.
 
 
 
 ### Question 4.1 -Create a codon usage table and quantify the codon usage bias among all coding sequences.
 
 
-`uco` allows us to assess the coding usage bias in an organism and this was applied to both. The ten highest relative synonymous codon usage (RSCU) are shown for each organism. This ensures a massive table for each organism isn't shown on the page. 
+`uco` allows us to assess the coding usage bias in an organism and this was applied to both. The ten highest relative synonymous codon usage (RSCU) are shown for each organism. This ensures a massive table for each organism isn’t shown on the page.
+
+
 ```{r, mychunk2.10}
 m_codon <- uco(m_dna, index="rscu", as.data.frame = TRUE)
 head(m_codon[order(m_codon$RSCU, decreasing = TRUE),], n=10L)%>%
@@ -406,46 +414,38 @@ head(e_codon[order(e_codon$RSCU, decreasing = TRUE),], n=10L)%>%
 ```
 
 
-The first ten are shown to minimise the output. Interestingly, ctg (lucine) was by far the highest expressed codon. In *E. coli*, second and third were both codons that coded for arginine. 
-
-
-Both organisms had a bias towards the cgc codon when coding for arginine.
-
+The first ten are shown to minimise the output. Interestingly, ctg (lucine) was by far the highest expressed
+codon. In E. coli, second and third were both codons that coded for arginine.
+Both organisms had a bias towards the cgc codon when coding for arginine
 
 ### Question 5.1 - In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most overand under-represented k-mers in your organism of interest.
 
+
 `options(scipen=999)` stops the expression of small numbers in scientific notation. K-mer analysis was done for *M. tuberculosis* to determine the five highest and five lowest 3-mers, 4-mers and 5-mers in the amino acid sequences. Once found, a simple `grep` function was used to find the same k-mers in *E. coli* eg grep("AAA", rownames(e_freq3)). All those values were used to construct comparitive bar plots.  
 
+
 ```{r, mychunk2.11}
+
 options(scipen=999)
-
-m_freq3 <-  seqinr::count(m_comp,wordsize=3,alphabet=aa,freq=TRUE)
-
-
+m_freq3 <- seqinr::count(m_comp,wordsize=3,alphabet=aa,freq=TRUE)
 m_sorted_high3 <- head(sort(m_freq3, decreasing = TRUE),n=5L)
-
 m_sorted_low3 <-head(sort(m_freq3, decreasing = FALSE),n=5L)
-
-
-e_freq3 <-  seqinr::count(e_comp,wordsize=3,alphabet=aa,freq=TRUE)
-
-
+e_freq3 <- seqinr::count(e_comp,wordsize=3,alphabet=aa,freq=TRUE)
 e_sorted_high3 <- e_freq3[c(1,2889,161,153,5777)]
-
-
 e_sorted_low3<-e_freq3[c(6603, 6280, 6288, 6319, 6335)]
 
-
-
 barplot(as.matrix(rbind(m_sorted_high3, e_sorted_high3)), beside = TRUE,
-        ylim = c(0,0.0035),
-        xlab = "3-mer Identification", ylab = "Frequecy",
-        main = "Up-regulated 3-mer in M. tuberculosis Amino Acid 
-        Sequence Compared to E.coli",
-         col = c("red","blue"))
+ ylim = c(0,0.0035),
+ xlab = "3-mer Identification", ylab = "Frequecy",
+ main = "Up-regulated 3-mer in M. tuberculosis Amino Acid 
+ Sequence Compared to E.coli",
+ col = c("red","blue"))
 legend("topright", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blue"), fill = c("red", "blue"))
 
 ```
+
+
+
 ```{r, mychunk2.12}
 barplot(as.matrix(rbind(m_sorted_low3, e_sorted_low3)), beside = TRUE, ylim = c(0, 0.000035), 
         xlab = "3-mer Identification", ylab = "Frequecy",
@@ -487,8 +487,6 @@ legend("topright", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "bl
 ```
 
 
-
-
 ```{r, mychunk2.16}
 m_freq5 <-  seqinr::count(m_comp,wordsize=5,alphabet=aa,freq=TRUE)
 m_sorted_high5 <- head(sort(m_freq5, decreasing = TRUE),n=5L)
@@ -509,6 +507,7 @@ barplot(as.matrix(rbind(m_sorted_high5, e_sorted_high5)), beside = TRUE, ylim = 
          col = c("red","blue"))
 legend("topright", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blue"), fill = c("red", "blue"))
 ```
+
 ```{r, mychunk2.18}
 barplot(as.matrix(rbind(m_sorted_low5, e_sorted_low5)), beside = TRUE, ylim = c(0, 0.000002), 
         xlab = "5-mer Identification", ylab = "Frequecy",
@@ -518,14 +517,8 @@ legend("top", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blue"),
 ```
 
 
+
 Above are all the graphs showing different k-mer lengths and shows what being over and under expressed in *M. tuberculosis* compared to *E. coil*. 
 
 
 One of the most obvious differences is the over representation of high alanine k-mers in *M. tuberculosis* compared to *E. coil*. Furthermore, there are far more k-mers that aren't represented at all in *M. tuberculosis* compared to *E. coil*. *M. tuberculosis* has a higher occurrence of k-mers that are mainly consisting of alanine than *E. coli*.Using the graphs shown above its easy to compare the over and under represented k-mer of *M. tuberculosis* compared to *E. coil*.
-
-
-
-
-
-
-
