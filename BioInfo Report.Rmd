@@ -8,18 +8,29 @@ output: html_document
 ### Intro 
 Source code: https://github.com/GregFarm/BioInformatics-Report-3-/blob/main/BioInfo%20Report.Rmd 
 
+
+This assignment is to assess our proficiency of using Rstudio and the r-coding language. With use of growth data, gene expression data and comparing the coding sequences of two bacteria, this report was constucted to show an understanding of some of the most useful aspects of Rstudio and how it can be applied in bioinformatics. All fo the coding sequences are left in for the clarity of the assessor. 
+
+
 Before knitting the Rmarkdown, please ensure that the correct libraries are loading in. The libraries needed are seqinr, kableExtra, R.utils. 
+A detailed explanation of all the chunks is giving in the 'Read Me' file, but through the report a brief explanation of the code is given directly after the question heading and after the output the results are explained and any assignment questions are answered.
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library("seqinr")
 library("kableExtra")
 library("R.utils")
-library("dplyr")
 ```
 
+
 # Assignement Part 1 - Gene Expression 
-### Questions 1 - Read in the gene_expression.cvs file and show the values of the first row 
+### Questions 1 - Read in the gene_expression.cvs file and show the values of the first six row 
+
+
+Simply, the table was read in, using `read.table`. The number of rows was specified, the `head` function could have been used too.
+
+
 ```{r, mychuck1.1}
 URL = "https://raw.githubusercontent.com/markziemann/SLE712_files/master/assessment_task3/bioinfo_asst3_part1_files/gene_expression.tsv"
 gene_exp <- read.table(URL, stringsAsFactors = FALSE, header = TRUE)
@@ -27,51 +38,97 @@ gene_exp[1:6,]
 ```
 
 
+
 ### Questions 2 - Make a new column which is the mean of the other columns. Show a table of values for the first six genes
 
 
+The desired columns were isolated in the data set and diveded my three to find the mean. Those mean values were stored in a now column in the gene_exp data frame. 
 ```{r, mychunk1.2}
 gene_mean <- (gene_exp$GTEX.1117F.0226.SM.5GZZ7 + gene_exp$GTEX.1117F.0426.SM.5EGHI + gene_exp$GTEX.1117F.0526.SM.5EGHJ)/3
 gene_exp['Mean'] <- signif(gene_mean, digits = 6)
 gene_exp[1:6,]
 
 ```
+
+
+
+
+
 ### Questions 3 - List the 10 genes with the highest mean expression
+
+
+The gene_exp data frame was ordered from highest to lowest mean and the top ten results are shown. 
 ```{r, mychunk1.3}
 high_mean <- gene_exp[order(-gene_exp$Mean),]
 high_mean[1:10,]
 ```
 
+
 ### Questions 4 - Determine the number of genes with a mean <10
+
+
+The gene_exp data frame was queried for mean vaules greater than ten, which returned a TRUE or FALSE valuse. The sum of the TRUE values were added together and shown.
 ```{r, mychunk1.4}
 true_sum <- gene_exp$Mean < 10
 sum(true_sum, na.rm = TRUE)
 ```
+
+
 If the mean was higher then 10 it converted it into a TRUE value, than the total amount of TRUE values was summed together. 
+
+
 It was found that 35,988 mean gene expression was higher then 10. 
 
+
 ### Questions 5 - Make a histogram plot of the mean values and include it into your report.
+
+
+A histagram of the Mean vaules was constructed. 
 ```{r, mychunk1.5}
 x_vals <- gene_exp$Mean
-h <-hist(x_vals,main="Mean Gene Expression Values", xlab="Mean Gene Expression",breaks= "scott" ,xlim=c(0,10000),ylim = c(0,50000), col = "blue")
+h <-hist(x_vals,main="Mean Gene Expression Values", xlab="Mean Gene Expression",breaks= "scott" ,xlim=c(0,12000),ylim = c(0,48500), col = "blue")
  
 ```
+
+
 ### Questions 6 - Import this csv file into an R object. What are the column names?
+
+
+Gene Expression cvs was read into Rstudio and the function `colnames` returned the names of the columns of the data frame. 
 ```{r, mychunk1.6}
 URL2 <- "https://raw.githubusercontent.com/markziemann/SLE712_files/master/assessment_task3/bioinfo_asst3_part1_files/growth_data.csv"
 grow_data <- read.csv(URL2)
 colnames(grow_data)
 ```
+
+
 Simply using the `colnames` function to return the column names, being:
+
+
 Site
+
+
 TreeID
+
+
 Circumf_2005_cm
+
+
 Circumf_2010_cm
+
+
 Circumf_2015_cm
+
+
 Circumf_2020_cm
 
+
 ### Questions 7 - Calculate the mean and standard deviation of tree circumference at the start and end of the study at both sites.
+
+
+The expression data was sorted my location using the `grep`function. The means and standard deviation of each of the lacations and timeframes is shown. `cat(paste` function is used to make the outputs more readable. 
 ```{r, mychunk1.7}
+#grep is used to isolate the required data 
 #northeast data
 NE_data <-grow_data[grep("northeast", grow_data$Site),]
 NE_mean05 <- mean(NE_data$Circumf_2005_cm, na.rm = TRUE)
@@ -94,9 +151,38 @@ cat(paste("SouthWest 2005 standard deviation =", signif(SW_SD05,digits = 3)), se
 cat(paste("SouthWest 2020 mean =", SW_mean20), sep="\n")    
 cat(paste("SouthWest 2020 standard deviation =", signif(SW_SD20,digits = 3)), sep="\n")         
 ```
-This returns all the values individually. 
+
+
+Above, the results are returned individually.
+
+NorthEast 2005 mean = 5.292
+
+
+NorthEast 2005 standard deviation = 0.914
+
+
+NorthEast 2020 mean = 54.228
+
+
+NorthEast 2020 standard deviation = 25.2
+
+
+SouthWest 2005 mean = 4.862
+
+
+SouthWest 2005 standard deviation = 1.15
+
+
+SouthWest 2020 mean = 45.596
+
+
+SouthWest 2020 standard deviation = 17.9
+
 
 ### Questions 8 - Make a box plot of tree circumference at the start and end of the study at both sites.
+
+
+A boxplot of both locations and timeframes was constructed. 
 ```{r, mychunk1.8}
 boxplot(NE_data$Circumf_2005_cm, NE_data$Circumf_2020_cm,
         SW_data$Circumf_2005_cm, SW_data$Circumf_2020_cm,
@@ -106,7 +192,12 @@ boxplot(NE_data$Circumf_2005_cm, NE_data$Circumf_2020_cm,
         col = "green"
         )
 ```
+
+
 ### Questions 9 - Calculate the mean growth over the last 10 years at each site.
+
+
+The date from the years 2010 - 2020 were isolated. The means of each column were found and added together and divded by three. 
 ```{r, mychunk1.9}
 NE_tenyear <-NE_data[,c("Circumf_2010_cm", "Circumf_2015_cm", "Circumf_2020_cm")]
 NE_tenyear_mean <- colMeans(NE_tenyear, na.rm = TRUE)
@@ -116,22 +207,42 @@ SW_tenyear <-SW_data[,c("Circumf_2010_cm", "Circumf_2015_cm", "Circumf_2020_cm")
 SW_tenyear_mean <- colMeans(SW_tenyear, na.rm = TRUE)
 sum(SW_tenyear_mean)/3
 ```
+
+
 Above is the mean growth for each site over the last 10 years. 
-The mean growth over a ten year period, 2010 to 2020, was 30.0 cm at the north east location and 25.7 cm at the south west location. 
+
+
+The mean growth over a ten year period, 2010 to 2020, was 30.0 cm at the north-east location and 25.7 cm at the south-west location. 
+
 
 ### Questions 10 - Use the t.test and wilcox.test functions to estimate the p-value that the 10 year growth is different at the two sites.
+
+
+`t.test` and `wilcox.test` were used to find different p-values for the each site over the last ten years.
 ```{r, mychunk 1.10}
-ttest <- t.test(NE_tenyear, SW_tenyear)
+ttest<- t.test(NE_tenyear, SW_tenyear)
 ttest$p.value
+
+NE_vec <- unlist(NE_tenyear)
+SW_vec <- unlist(SW_tenyear)
+wilcox <- wilcox.test(NE_vec, SW_vec)
+wilcox
 ```
 
+
+The p-values attained for the t-test and Wilcoxon tests were different, being 0.0779 and 0.161 respectively. Considering there aren't any obvious outliners in the data, the t-test would be considered more accurate 
 
 
 # Assignement Part 2 - Examining biological sequence diversity
 
-For this section the organisms being used are E.coli (SPECIFY) and Mycobacterium tuberculosis (GCA_001318445)
+
+For this section the organisms being used are *Mycobacterium tuberculosis* (GCA_001318445) and *Escherichia coli* str. K-12 substr. MG1655 str. K12 (GCA_000005845)
+
 
 ### Questions 1.1 - Download the whole set of coding DNA sequences for E. coli and your organism of interest. 
+
+
+Both organsisms FASTA files were read into Rstudio. 
 ```{r, mychunk2.1}
 URL_M <- "http://ftp.ensemblgenomes.org/pub/bacteria/release-53/fasta/bacteria_4_collection/mycobacterium_tuberculosis_gca_001318445/cds/Mycobacterium_tuberculosis_gca_001318445.6505_5_10.cds.all.fa.gz"
 download.file(URL_M, destfile = "Mturb_cds.fa.gz")
@@ -147,11 +258,17 @@ mturb_cds <- seqinr::read.fasta("Mturb_cds.fa")
 ```
 ### Question 1.2 - How many coding sequences are present in these organisms? How much coding DNA is there in total for these two organisms? Describe any differences between the two organisms.
 
+
+The amount of coding sequences was found. `unzip` was used to to unpack the DNA info out of its coding sequences and the total amount was found. 
+
 ```{r, mychunk2.2}
 length(mturb_cds)
 length(ecoli_cds)
 ```
-The total amount of coding sequences in M. tuberculosis is 4,752 and for E. coli the total amount of coding sequences is 4239.
+
+
+The total amount of coding sequences in *M. tuberculosis* is 4,752 and for *E. coli* the total amount of coding sequences is 4239.
+
 
 ```{r, mychunk2.3}
 m_len<-sapply(X = mturb_cds, FUN = length)
@@ -159,12 +276,21 @@ sum(m_len)
 e_len<-sapply(X = ecoli_cds, FUN = length)
 sum(e_len)
 ```
-M. tuberculosis has a total of 3,072,513 coding nucleotides.
-E. coli has a total of 3,978,528 coding nucleotides. 
 
-M. tuberculosis has 513 more coding sequences, yet nearly 1 million less coding nucleotides comapred to E. coli. 
+
+*M. tuberculosis* has a total of 3,072,513 coding nucleotides.
+
+
+*E. coli* has a total of 3,978,528 coding nucleotides. 
+
+
+*M. tuberculosis* has 513 more coding sequences, yet nearly 1 million less coding nucleotides compared to *E. coli*. 
+
 
 ### Question 2.1 - Calculate the length of all coding sequences in these two organisms. Make a boxplot of coding sequence length in these organisms.
+
+
+The lengths of all coding sequences was found above and those values were used to construct a boxplot
 
 ```{r, mychunk2.4}
 boxplot(m_len, e_len, names = c("M. tuberculosis","E. coli"),
@@ -174,8 +300,11 @@ boxplot(m_len, e_len, names = c("M. tuberculosis","E. coli"),
 
 ```
 
+
 ### Question 2.2 - What is the mean and median coding sequence length of these two organisms? Describe any differences between the two organisms
 
+
+Simply used the `mean` and `median` to find the desired values. 
 ```{r, mychunk2.5}
 signif(mean(m_len), digits = 4) 
 median(m_len)
@@ -183,41 +312,53 @@ median(m_len)
 signif(mean(e_len), digits = 4) 
 median(e_len)
 ```
-The mean and median coding sequences length for M. tuberculosis was shown to be 647bp and 501bp respectively. 
-The mean and median coding sequences length for E. coli was shown to be 939 bp and 801bp respectively. (MORE DETAILS)
 
-### Question 3.1 - Calculate the frequency of DNA bases in the total coding sequences for both organisms. Perform the same calculation for the total protein sequence.   
+
+The mean and median coding sequences length for *M. tuberculosis* was shown to be 647bp and 501bp respectively. 
+
+
+The mean and median coding sequences length for *E. coli* was shown to be 939 bp and 801bp respectively. (MORE DETAILS)
+
+
+### Question 3.1 - Calculate the frequency of DNA bases in the total coding sequences for both organisms. Perform the same calculation for the total protein sequence.  
+
+
+The library seqinr allows for the total amount of each nucleotide to be found using the `count` function. The amino acid composition is able to be found using the `translate` funtion and applying it to the DNA sequences data. 
 ```{r, muchunk2.6}
-# nt count 
 m_dna <- unlist(mturb_cds)
-m_dna_comp <-count(m_dna, wordsize = 1)
+m_dna_comp <-seqinr::count(m_dna, wordsize = 1)
 m_dna_comp
 
 e_dna <- unlist(ecoli_cds)
-e_dna_comp <-count(e_dna, wordsize = 1)
+e_dna_comp <-seqinr::count(e_dna, wordsize = 1)
 e_dna_comp
 
 ```
-```{r, mychunk2.8}
-#AA count 
-#MINUS THE TERMINATION CODON
 
+
+The output above shows first the *M. tuberculosis* DNA composition and then *E. coli* 
+
+
+```{r, mychunk2.7}
 m_prot <- lapply(mturb_cds, translate)
 aa <- unique(m_prot[[2]])
 aa <- aa[aa != "*"]
 m_comp <- unlist(m_prot)
-m_aa <- count(m_comp, wordsize = 1 , alphabet = aa)
+m_aa <- seqinr::count(m_comp, wordsize = 1 , alphabet = aa)
 
 
 e_prot <- lapply(X=ecoli_cds, FUN = translate)
 e_comp<- unlist(e_prot)
-e_aa <-count(e_comp, wordsize = 1, alphabet = aa)
+e_aa <-seqinr::count(e_comp, wordsize = 1, alphabet = aa)
 ```
+
 
 ### Question 3.2 -Create bar plots for nucleotide and amino acid frequency. Describe any differences between the two organisms.
 
-```{r, mychunk2.7}
-#NT barplot
+
+A barplot is used to compare the nucleotide frequency of the two organsisms, the same is doen for the amino acids. 
+```{r, mychunk2.8}
+
 barplot(as.matrix(rbind(m_dna_comp, e_dna_comp)), beside = TRUE, 
         names = c("a","c","g","t"), col = c("red","blue"),
         ylim = c(0,1200000),
@@ -227,75 +368,160 @@ legend("topleft", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blu
 ```
 
 
+We know from questions 1 that *M. tuberculosis* have close to 1 million less base-pairs. Which can be seen in the graph above. *M. tuberculosis* has around after the amount of adenine and thymine when compared to *E. coli*.
+
+
 ```{r, mychunk2.9}
-#AA bar plot
+
 barplot(as.matrix(rbind(m_aa, e_aa)), beside = TRUE, ylim = c(0,160000), 
         col = c("red","blue"),
         xlab = "Amino Acids", ylab = "Amino Acid Frequency",
         main = "Amino Acid Fequencies Comparison Between M. tuberculosis & E. coli")
 legend("topright", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blue"), fill = c("red", "blue"))
 ```
-DESCRIBE ANY DIFFERENCES
+
+
+We can see in the graph above that on average *E. coli* contains more of each amino acid, except for Arganine, Proline and Alanine. 
+
+
+This would be expected due the *E. coli* have close to 1 million more nucleotides in the coding DNA. 
+
+
 
 ### Question 4.1 -Create a codon usage table and quantify the codon usage bias among all coding sequences.
 
+
+`uco` allows us to assess the coding usage bias in an organism and this was applied to both. The ten highest relative synonymous codon usage (RSCU) are shown for each organism. This ensures a massive table for each organism isn't shown on the page. 
 ```{r, mychunk2.10}
 m_codon <- uco(m_dna, index="rscu", as.data.frame = TRUE)
-m_codon%>%
-  kbl(caption = "M. tuberculosis Codon Usage")%>%
+head(m_codon[order(m_codon$RSCU, decreasing = TRUE),], n=10L)%>%
+  kbl(caption = "M. tuberculosis Codon Usage: Top 10")%>%
   kable_styling(bootstrap_option = c("striped", "hover", "responsive", "condensed"), full_width = TRUE, fixed_thead=TRUE )
 
 e_codon <-uco(e_dna, index="rscu", as.data.frame = TRUE)
-e_codon[order(e_codon$RSCU, decreasing = TRUE),]%>%
-  kbl(caption = "E coli Codon Usage")%>%
+head(e_codon[order(e_codon$RSCU, decreasing = TRUE),], n=10L)%>%
+  kbl(caption = "E coli Codon Usage: Top 10")%>%
   kable_styling(bootstrap_option = c("striped", "hover", "responsive", "condensed"), full_width = TRUE, fixed_thead=TRUE )
 
 ```
-DESCRIBE BIAS
+
+
+The first ten are shown to minimise the output. Interestingly, ctg (lucine) was by far the highest expressed codon. In *E. coli*, second and third were both codons that coded for arginine. 
+
+
+Both organisms had a bias towards the cgc codon when coding for arginine.
 
 
 ### Question 5.1 - In the organism of interest, identify 10 protein sequence k-mers of length 3-5 which are the most overand under-represented k-mers in your organism of interest.
 
+`options(scipen=999)` stops the expression of small numbers in scientific notation. K-mer analysis was done for *M. tuberculosis* to determine the five highest and five lowest 3-mers, 4-mers and 5-mers in the amino acid sequences. Once found, a simple `grep` function was used to find the same k-mers in *E. coli* eg grep("AAA", rownames(e_freq3)). All those values were used to construct comparitive bar plots.  
+
 ```{r, mychunk2.11}
 options(scipen=999)
-#M. tuberculosis k-mer (3,4,5)
-m_freq3 <-  count(m_comp,wordsize=3,alphabet=aa,freq=TRUE)
-m_freq4 <-  count(m_comp,wordsize=4,alphabet=aa,freq=TRUE)
-m_freq5 <-  count(m_comp,wordsize=5,alphabet=aa,freq=TRUE)
 
-m_sorted_high <- head(sort(m_freq3, decreasing = TRUE),n=5L)
-m_sorted_high
- AAA         LAA         AAL         ALA         VAA 
-m_sorted_low <-head(sort(m_freq3, decreasing = FALSE),n=5L)
-m_sorted_low
-YHM            WKM            WKW            WMN            WNK 
+m_freq3 <-  seqinr::count(m_comp,wordsize=3,alphabet=aa,freq=TRUE)
 
 
-#E.coli k-mer (3,4,5)
-e_freq3 <-  count(e_comp,wordsize=3,alphabet=aa,freq=TRUE)
-e_freq4 <-  count(e_comp,wordsize=4,alphabet=aa,freq=TRUE)
-e_freq5 <-  count(e_comp,wordsize=5,alphabet=aa,freq=TRUE)
+m_sorted_high3 <- head(sort(m_freq3, decreasing = TRUE),n=5L)
 
-View(e_freq3)
-
-e_sorted_high <- e_freq3[c(1,2889,161,153,5777)]
-e_sorted_high
-
-e_sorted_low <-head(sort(e_freq3, decreasing = FALSE),n=5L)
-e_sorted_low
+m_sorted_low3 <-head(sort(m_freq3, decreasing = FALSE),n=5L)
 
 
-barplot(as.matrix(rbind(m_sorted_high, e_sorted_high)), beside = TRUE)
-barplot(as.matrix(rbind(m_sorted_low, e_sorted_low)), beside = TRUE)
+e_freq3 <-  seqinr::count(e_comp,wordsize=3,alphabet=aa,freq=TRUE)
 
+
+e_sorted_high3 <- e_freq3[c(1,2889,161,153,5777)]
+
+
+e_sorted_low3<-e_freq3[c(6603, 6280, 6288, 6319, 6335)]
+
+
+
+barplot(as.matrix(rbind(m_sorted_high3, e_sorted_high3)), beside = TRUE,
+        ylim = c(0,0.0035),
+        xlab = "3-mer Identification", ylab = "Frequecy",
+        main = "Up-regulated 3-mer in M. tuberculosis Amino Acid 
+        Sequence Compared to E.coli",
+         col = c("red","blue"))
+legend("topright", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blue"), fill = c("red", "blue"))
+
+```
+```{r, mychunk2.12}
+barplot(as.matrix(rbind(m_sorted_low3, e_sorted_low3)), beside = TRUE, ylim = c(0, 0.000035), 
+        xlab = "3-mer Identification", ylab = "Frequecy",
+        main = "Under-represented 3-mer in M. tuberculosis Compared to E.coli",
+         col = c("red","blue"))
+legend("top", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blue"), fill = c("red", "blue"))
+```
+
+
+```{r, mychunk2.13}
+m_freq4 <-  seqinr::count(m_comp,wordsize=4,alphabet=aa,freq=TRUE)
+m_sorted_high4 <- head(sort(m_freq4, decreasing = TRUE),n=5L)
+
+e_freq4 <-  seqinr::count(e_comp,wordsize=4,alphabet=aa,freq=TRUE)
+e_sorted_high4<-e_freq4[c(1, 2889, 153, 54873, 9)]
+
+
+m_sorted_low4 <- head(sort(m_freq4, decreasing = FALSE),n=5L)
+
+
+e_sorted_low4<-e_freq4[c(341, 475, 540, 569, 703)]
+```
+
+```{r, mychunk2.14}
+barplot(as.matrix(rbind(m_sorted_high4, e_sorted_high4)), beside = TRUE, ylim = c(0, 0.0006), 
+        xlab = "4-mer Identification", ylab = "Frequecy",
+        main = "Over-represented 4-mer in M. tuberculosis Compared to E.coli",
+         col = c("red","blue"))
+legend("topright", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blue"), fill = c("red", "blue"))
+```
+
+
+```{r, mychunk2.15}
+barplot(as.matrix(rbind(m_sorted_low4, e_sorted_low4)), beside = TRUE, ylim = c(0, 0.000008), 
+        xlab = "4-mer Identification", ylab = "Frequecy",
+        main = "Under-represented 4-mer in M. tuberculosis Compared to E.coli",
+         col = c("red","blue"))
+legend("topright", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blue"), fill = c("red", "blue"))
 ```
 
 
 
 
+```{r, mychunk2.16}
+m_freq5 <-  seqinr::count(m_comp,wordsize=5,alphabet=aa,freq=TRUE)
+m_sorted_high5 <- head(sort(m_freq5, decreasing = TRUE),n=5L)
+
+e_freq5 <-  seqinr::count(e_comp,wordsize=5,alphabet=aa,freq=TRUE)
+e_sorted_high5<-e_freq5[c(1, 2889, 54873, 153, 5777)]
+
+m_sorted_low5 <- head(sort(m_freq5, decreasing = FALSE),n=5L)
+
+e_sorted_low5<-e_freq5[c(70, 73, 103, 132, 137)]
+```
 
 
+```{r, mychunk2.17}
+barplot(as.matrix(rbind(m_sorted_high5, e_sorted_high5)), beside = TRUE, ylim = c(0, 0.00015), 
+        xlab = "5-mer Identification", ylab = "Frequecy",
+        main = "Over-represented 5-mer in M. tuberculosis Compared to E.coli",
+         col = c("red","blue"))
+legend("topright", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blue"), fill = c("red", "blue"))
+```
+```{r, mychunk2.18}
+barplot(as.matrix(rbind(m_sorted_low5, e_sorted_low5)), beside = TRUE, ylim = c(0, 0.000002), 
+        xlab = "5-mer Identification", ylab = "Frequecy",
+        main = "Under-represented 5-mer in M. tuberculosis Compared to E.coli",
+         col = c("red","blue"))
+legend("top", c("M.tuberculosis", "E. coli"), horiz = T, col = c("red", "blue"), fill = c("red", "blue"))
+```
 
+
+Above are all the graphs showing different k-mer lengths and shows what being over and under expressed in *M. tuberculosis* compared to *E. coil*. 
+
+
+One of the most obvious differences is the over representation of high alanine k-mers in *M. tuberculosis* compared to *E. coil*. Furthermore, there are far more k-mers that aren't represented at all in *M. tuberculosis* compared to *E. coil*. *M. tuberculosis* has a higher occurrence of k-mers that are mainly consisting of alanine than *E. coli*.Using the graphs shown above its easy to compare the over and under represented k-mer of *M. tuberculosis* compared to *E. coil*.
 
 
 
